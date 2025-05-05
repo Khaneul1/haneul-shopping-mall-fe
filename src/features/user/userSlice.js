@@ -6,7 +6,21 @@ import { initialCart } from '../cart/cartSlice';
 
 export const loginWithEmail = createAsyncThunk(
   'user/loginWithEmail',
-  async ({ email, password }, { rejectWithValue }) => {}
+  async ({ email, password }, { rejectWithValue }) => {
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      // success >> mainPage
+      // navigate 호출 방식도 있지만 로그인 페이지에서 처리할 것
+
+      return response.data;
+      // return response.data.user; 도 가능
+    } catch (error) {
+      // 실패 : 토스트 메시지 보여줄 수 있지만
+      // alert 메시지로 보여 줄 수 있도록 할 것 (로그인 페이지)
+      // 실패시 생긴 에러값 reducer에 저장
+      return rejectWithValue(error.error);
+    }
+  }
 );
 
 export const loginWithGoogle = createAsyncThunk(
@@ -89,6 +103,19 @@ const userSlice = createSlice({
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.registrationError = action.payload;
+      })
+      .addCase(loginWithEmail.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(loginWithEmail.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.loginError = null; //초기화
+      })
+      .addCase(loginWithEmail.rejected, (state, action) => {
+        state.loading = false;
+
+        state.loginError = action.payload;
       });
   },
 });
