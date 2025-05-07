@@ -12,6 +12,11 @@ export const loginWithEmail = createAsyncThunk(
       // success >> mainPage
       // navigate 호출 방식도 있지만 로그인 페이지에서 처리할 것
 
+      // 토큰 저장 로그인 : (1) local storage (2) session storage
+      // local : 브라우저가 꺼지거나 창을 새로 열어도 같은 주소로 접속했다면 유지가 됨
+      // session : 브라우저 끈다 == 세션 끈다 라는 의미여서 브라우저 끄면 값 사라짐
+      sessionStorage.setItem('token', response.data.token);
+
       return response.data;
       // return response.data.user; 도 가능
     } catch (error) {
@@ -25,10 +30,18 @@ export const loginWithEmail = createAsyncThunk(
 
 export const loginWithGoogle = createAsyncThunk(
   'user/loginWithGoogle',
-  async (token, { rejectWithValue }) => {}
+  async (token, { rejectWithValue }) => {
+    try {
+      const response = await api.get('/user/me');
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.error);
+    }
+  }
 );
 
 export const logout = () => (dispatch) => {};
+
 export const registerUser = createAsyncThunk(
   'user/registerUser',
   async (
@@ -70,7 +83,11 @@ export const registerUser = createAsyncThunk(
 
 export const loginWithToken = createAsyncThunk(
   'user/loginWithToken',
-  async (_, { rejectWithValue }) => {}
+  async (_, { rejectWithValue }) => {
+    // _ : 주는 정보가 없음 (토큰으로 로그인할 거라서)
+    // 토큰 어디서 받아와요? :: 로그인 할 당시에 토큰을 저장해 두잖아용
+    // 저장해 둔 토큰
+  }
 );
 
 const userSlice = createSlice({
@@ -109,14 +126,25 @@ const userSlice = createSlice({
       })
       .addCase(loginWithEmail.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload.user;
+        state.user = action.payload;
         state.loginError = null; //초기화
       })
       .addCase(loginWithEmail.rejected, (state, action) => {
         state.loading = false;
-
         state.loginError = action.payload;
+      })
+      // .addCase(loginWithToken.pending, (state, action) => {
+      //   // 유저가 로그인을 했는가의 여부는 뒤에서 하는 작업이지 굳이 렌더링 해 줄 필요없음
+      //   // 그래서 로딩 스피너는 필요없더요 ~~
+      // }) // 그래서 지워 줍니다
+      .addCase(loginWithToken.fulfilled, (state, action) => {
+        // 성공 시 아래와 같이 세팅
+        state.user = action.payload;
       });
+    // .addCase(loginWithToken.rejected, (state, action) => {
+    //   // 만약 실패했다면 > 다시 로그인 페이지 보여 주면 되잖아요?
+    //   // 그래서 얘도 딱히 필요없음
+    // });
   },
 });
 export const { clearErrors } = userSlice.actions;
