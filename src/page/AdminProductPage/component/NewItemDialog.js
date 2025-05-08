@@ -1,23 +1,24 @@
-import React, { useState, useEffect } from "react";
-import { Form, Modal, Button, Row, Col, Alert } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
-import CloudinaryUploadWidget from "../../../utils/CloudinaryUploadWidget";
-import { CATEGORY, STATUS, SIZE } from "../../../constants/product.constants";
-import "../style/adminProduct.style.css";
+import React, { useState, useEffect } from 'react';
+import { Form, Modal, Button, Row, Col, Alert } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
+import CloudinaryUploadWidget from '../../../utils/CloudinaryUploadWidget';
+import { CATEGORY, STATUS, SIZE } from '../../../constants/product.constants';
+import '../style/adminProduct.style.css';
 import {
   clearError,
   createProduct,
   editProduct,
-} from "../../../features/product/productSlice";
+} from '../../../features/product/productSlice';
+import { update } from '@react-spring/web';
 
 const InitialFormData = {
-  name: "",
-  sku: "",
+  name: '',
+  sku: '',
   stock: {},
-  image: "",
-  description: "",
+  image: '',
+  description: '',
   category: [],
-  status: "active",
+  status: 'active',
   price: 0,
 };
 
@@ -26,7 +27,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
     (state) => state.product
   );
   const [formData, setFormData] = useState(
-    mode === "new" ? { ...InitialFormData } : selectedProduct
+    mode === 'new' ? { ...InitialFormData } : selectedProduct
   );
   const [stock, setStock] = useState([]);
   const dispatch = useDispatch();
@@ -41,7 +42,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
       dispatch(clearError());
     }
     if (showDialog) {
-      if (mode === "edit") {
+      if (mode === 'edit') {
         setFormData(selectedProduct);
         // 객체형태로 온 stock을  다시 배열로 세팅해주기
         const sizeArray = Object.keys(selectedProduct.stock).map((size) => [
@@ -66,31 +67,71 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
     //재고를 입력했는지 확인, 아니면 에러
     // 재고를 배열에서 객체로 바꿔주기
     // [['M',2]] 에서 {M:2}로
-    if (mode === "new") {
+    if (stock.length === 0) {
+      setStockError(true); //재고가 비었으면 에러 띄우기
+      return;
+    }
+
+    // 배열을 객체로 전환하기
+    const stockObject = {};
+    stock.forEach(([size, quantity]) => {
+      if (size) {
+        stockObject[size] = quantity;
+      }
+    });
+
+    // 전체 데이터 구성
+    const payload = {
+      ...formData, //{title:'청바지', description: '블루진}
+      stock: stockObject, //{S:10, M:4}
+    };
+
+    if (mode === 'new') {
       //새 상품 만들기
+      dispatch(createProduct(payload));
     } else {
       // 상품 수정하기
+      dispatch(editProduct({ ...payload, id: selectedProduct._id }));
     }
   };
 
   const handleChange = (event) => {
     //form에 데이터 넣어주기
+    const { id, value } = event.target;
+    setFormData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
   };
 
   const addStock = () => {
     //재고타입 추가시 배열에 새 배열 추가
+    setStock((prev) => [...prev, ['', 0]]);
   };
 
   const deleteStock = (idx) => {
     //재고 삭제하기
+    setStock((prev) => prev.filter((_, index) => index !== idx));
+    // 지피티가 알려준 코드..
+    // stock[1]을 삭제하려면, 해당 인덱스를 제외한 나머지를 유지하는 코드임
   };
 
   const handleSizeChange = (value, index) => {
     //  재고 사이즈 변환하기
+    setStock((prev) => {
+      const updated = [...prev]; //기존 배열을 복사해서 [...prev]
+      updated[index][0] = value; //사이즈 (첫 번째 항목) 변경!!
+      return updated;
+    });
   };
 
   const handleStockChange = (value, index) => {
     //재고 수량 변환하기
+    setStock((prev) => {
+      const updated = [...prev];
+      updated[index][1] = Number(value); //수량 (두 번째 항목) 숫자로 변환 후 저장!!
+      return updated;
+    });
   };
 
   const onHandleCategory = (event) => {
@@ -117,7 +158,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
   return (
     <Modal show={showDialog} onHide={handleClose}>
       <Modal.Header closeButton>
-        {mode === "new" ? (
+        {mode === 'new' ? (
           <Modal.Title>Create New Product</Modal.Title>
         ) : (
           <Modal.Title>Edit Product</Modal.Title>
@@ -183,7 +224,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
                       handleSizeChange(event.target.value, index)
                     }
                     required
-                    defaultValue={item[0] ? item[0].toLowerCase() : ""}
+                    defaultValue={item[0] ? item[0].toLowerCase() : ''}
                   >
                     <option value="" disabled selected hidden>
                       Please Choose...
@@ -283,7 +324,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
             </Form.Select>
           </Form.Group>
         </Row>
-        {mode === "new" ? (
+        {mode === 'new' ? (
           <Button variant="primary" type="submit">
             Submit
           </Button>
