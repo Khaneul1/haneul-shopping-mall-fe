@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { Container, Button } from "react-bootstrap";
-import { useDispatch, useSelector } from "react-redux";
-import { useSearchParams, useNavigate } from "react-router-dom";
-import ReactPaginate from "react-paginate";
-import SearchBox from "../../common/component/SearchBox";
-import NewItemDialog from "./component/NewItemDialog";
-import ProductTable from "./component/ProductTable";
+import React, { useEffect, useState } from 'react';
+import { Container, Button } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import ReactPaginate from 'react-paginate';
+import SearchBox from '../../common/component/SearchBox';
+import NewItemDialog from './component/NewItemDialog';
+import ProductTable from './component/ProductTable';
 import {
   getProductList,
   deleteProduct,
   setSelectedProduct,
-} from "../../features/product/productSlice";
+} from '../../features/product/productSlice';
 
 const AdminProductPage = () => {
   const navigate = useNavigate();
@@ -19,21 +19,21 @@ const AdminProductPage = () => {
   const { productList, totalPageNum } = useSelector((state) => state.product);
   const [showDialog, setShowDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState({
-    page: query.get("page") || 1,
-    name: query.get("name") || "",
+    page: query.get('page') || 1,
+    name: query.get('name') || '',
   }); //검색 조건들을 저장하는 객체
 
-  const [mode, setMode] = useState("new");
+  const [mode, setMode] = useState('new');
 
   const tableHeader = [
-    "#",
-    "Sku",
-    "Name",
-    "Price",
-    "Stock",
-    "Image",
-    "Status",
-    "",
+    '#',
+    'Sku',
+    'Name',
+    'Price',
+    'Stock',
+    'Image',
+    'Status',
+    '',
   ];
 
   //상품리스트 가져오기 (url쿼리 맞춰서)
@@ -53,7 +53,10 @@ const AdminProductPage = () => {
 
   const handleClickNewItem = () => {
     //new 모드로 설정하고
+    setMode('new');
     // 다이얼로그 열어주기
+    // showDialog : state값이라 처음 값이 false임
+    setShowDialog(true);
   };
 
   const handlePageClick = ({ selected }) => {

@@ -98,40 +98,37 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
   const handleChange = (event) => {
     //form에 데이터 넣어주기
     const { id, value } = event.target;
-    setFormData((prev) => ({
-      ...prev,
-      [id]: value,
-    }));
+    // formData 모드가 new라면 initial form data를 쓰겠다고 정의해 둠!
+    setFormData({ ...formData, [id]: value });
   };
 
   const addStock = () => {
     //재고타입 추가시 배열에 새 배열 추가
-    setStock((prev) => [...prev, ['', 0]]);
+    setStock([...stock, []]); //stock에 새로운 배열을 추가하겠다는 의미
   };
 
   const deleteStock = (idx) => {
     //재고 삭제하기
-    setStock((prev) => prev.filter((_, index) => index !== idx));
-    // 지피티가 알려준 코드..
-    // stock[1]을 삭제하려면, 해당 인덱스를 제외한 나머지를 유지하는 코드임
+    const newStock = stock.filter((item, index) => index !== idx);
+    // 삭제하려고 선택한 idx를 제외하고 다 필터해서 넣으면 됨
+    setStock(newStock);
   };
 
   const handleSizeChange = (value, index) => {
     //  재고 사이즈 변환하기
-    setStock((prev) => {
-      const updated = [...prev]; //기존 배열을 복사해서 [...prev]
-      updated[index][0] = value; //사이즈 (첫 번째 항목) 변경!!
-      return updated;
-    });
+    // 인덱스 값에 있는 value를 바꿔줘야 함!!
+    const newStock = [...stock];
+    // index번째 값에 있는 0번째 값 : [[s,3], [m,4], [xl:5]] 중 s,m,xl를 의미
+    newStock[index][0] = value; //해당 값을 내가 받아온 value 값으로 바꿔주겠다
+    setStock(newStock);
   };
 
   const handleStockChange = (value, index) => {
     //재고 수량 변환하기
-    setStock((prev) => {
-      const updated = [...prev];
-      updated[index][1] = Number(value); //수량 (두 번째 항목) 숫자로 변환 후 저장!!
-      return updated;
-    });
+    // 수량은 [[s,3], [m,4], [xl:5]] 중 1번째 값 : 3개, 4개, 5개를 의미
+    const newStock = [...stock];
+    newStock[index][1] = value;
+    setStock(newStock);
   };
 
   const onHandleCategory = (event) => {

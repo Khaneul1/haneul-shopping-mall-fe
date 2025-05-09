@@ -30,17 +30,14 @@ export const loginWithEmail = createAsyncThunk(
 
 export const loginWithGoogle = createAsyncThunk(
   'user/loginWithGoogle',
-  async (token, { rejectWithValue }) => {
-    try {
-      const response = await api.get('/user/me');
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.error);
-    }
-  }
+  async (token, { rejectWithValue }) => {}
 );
 
-export const logout = () => (dispatch) => {};
+export const logout = () => (dispatch) => {
+  sessionStorage.removeItem('token'); //저장된 토큰 삭제
+  dispatch(initialCart()); //장바구나 초기화
+  dispatch(userSlice.actions.setUser(null)); //사용자 정보 제거
+};
 
 export const registerUser = createAsyncThunk(
   'user/registerUser',
@@ -87,6 +84,14 @@ export const loginWithToken = createAsyncThunk(
     // _ : 주는 정보가 없음 (토큰으로 로그인할 거라서)
     // 토큰 어디서 받아와요? :: 로그인 할 당시에 토큰을 저장해 두잖아용
     // 저장해 둔 토큰
+    try {
+      const response = await api.get('/user/me');
+      console.log('토큰 로그인 결과: ', response.data);
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.error);
+    }
   }
 );
 
@@ -104,6 +109,9 @@ const userSlice = createSlice({
     clearErrors: (state) => {
       state.loginError = null;
       state.registrationError = null;
+    },
+    setUser: (state, action) => {
+      state.user = action.payload;
     },
   },
   // async처럼 외부 함수를 통해 호출되는 경우
