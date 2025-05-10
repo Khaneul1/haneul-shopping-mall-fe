@@ -64,36 +64,53 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    console.log('form data', formData); //stock 안 들어가있음
+    //initail form data : stock
+    //우리가 따로 만든 state에 stock을 넣어 줌!!
+    //그래서 이 값을 stock의 객체 값으로 올려줘야겠죠?
+    console.log('form data stock', stock);
+    //['s', '3']
+
     //재고를 입력했는지 확인, 아니면 에러
+    if (stock.length === 0) return setStockError(true);
+
     // 재고를 배열에서 객체로 바꿔주기
     // [['M',2]] 에서 {M:2}로
-    if (stock.length === 0) {
-      setStockError(true); //재고가 비었으면 에러 띄우기
-      return;
-    }
 
-    // 배열을 객체로 전환하기
-    const stockObject = {};
-    stock.forEach(([size, quantity]) => {
-      if (size) {
-        stockObject[size] = quantity;
-      }
-    });
-
-    // 전체 데이터 구성
-    const payload = {
-      ...formData, //{title:'청바지', description: '블루진}
-      stock: stockObject, //{S:10, M:4}
-    };
-
+    // reduce : array 값 받아와서 내가 원하는 형태로 바꿔 줄 수 있는 것
+    const totalStock = stock.reduce((total, item) => {
+      return { ...total, [item[0]]: parseInt(item[1]) };
+    }, {});
+    console.log('form data total stock', totalStock);
     if (mode === 'new') {
       //새 상품 만들기
-      dispatch(createProduct(payload));
+      dispatch(createProduct({ ...formData, stock: totalStock })); //createProduct에는 formData를 보내 줘야 함
     } else {
-      // 상품 수정하기
-      dispatch(editProduct({ ...payload, id: selectedProduct._id }));
+      //상품 수정하기
     }
   };
+
+  // 배열을 객체로 전환하기
+  const stockObject = {};
+  stock.forEach(([size, quantity]) => {
+    if (size) {
+      stockObject[size] = quantity;
+    }
+  });
+
+  // 전체 데이터 구성
+  const payload = {
+    ...formData, //{title:'청바지', description: '블루진}
+    stock: stockObject, //{S:10, M:4}
+  };
+
+  if (mode === 'new') {
+    //새 상품 만들기
+    dispatch(createProduct(payload));
+  } else {
+    // 상품 수정하기
+    dispatch(editProduct({ ...payload, id: selectedProduct._id }));
+  }
 
   const handleChange = (event) => {
     //form에 데이터 넣어주기
@@ -132,6 +149,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
   };
 
   const onHandleCategory = (event) => {
+    // 카테고리가 이미 추가되어 있으면 제거
     if (formData.category.includes(event.target.value)) {
       const newCategory = formData.category.filter(
         (item) => item !== event.target.value
@@ -141,6 +159,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
         category: [...newCategory],
       });
     } else {
+      //아니면 새로 추가
       setFormData({
         ...formData,
         category: [...formData.category, event.target.value],
@@ -150,6 +169,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
 
   const uploadImage = (url) => {
     //이미지 업로드
+    setFormData({ ...formData, image: url });
   };
 
   return (
@@ -274,7 +294,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
             src={formData.image}
             className="upload-image mt-2"
             alt="uploadedimage"
-          ></img>
+          />
         </Form.Group>
 
         <Row className="mb-3">

@@ -6,17 +6,19 @@ import { initialCart } from '../cart/cartSlice';
 
 export const loginWithEmail = createAsyncThunk(
   'user/loginWithEmail',
-  async ({ email, password }, { rejectWithValue }) => {
+  async ({ email, password, navigate }, { rejectWithValue }) => {
     try {
       const response = await api.post('/auth/login', { email, password });
       // success >> mainPage
       // navigate 호출 방식도 있지만 로그인 페이지에서 처리할 것
 
+      console.log('로그인 응답 확인: ', response.data);
+      console.log('받은 토큰 확인 : ', response.data.token);
+
       // 토큰 저장 로그인 : (1) local storage (2) session storage
       // local : 브라우저가 꺼지거나 창을 새로 열어도 같은 주소로 접속했다면 유지가 됨
       // session : 브라우저 끈다 == 세션 끈다 라는 의미여서 브라우저 끄면 값 사라짐
       sessionStorage.setItem('token', response.data.token);
-
       return response.data;
       // return response.data.user; 도 가능
     } catch (error) {
@@ -87,7 +89,6 @@ export const loginWithToken = createAsyncThunk(
     try {
       const response = await api.get('/user/me');
       console.log('토큰 로그인 결과: ', response.data);
-
       return response.data;
     } catch (error) {
       return rejectWithValue(error.error);
