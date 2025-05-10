@@ -19,6 +19,12 @@ export const loginWithEmail = createAsyncThunk(
       // local : 브라우저가 꺼지거나 창을 새로 열어도 같은 주소로 접속했다면 유지가 됨
       // session : 브라우저 끈다 == 세션 끈다 라는 의미여서 브라우저 끄면 값 사라짐
       sessionStorage.setItem('token', response.data.token);
+
+      //유저 정보만 넣어야 하는데 response.data를 하게 되면 모든 response data를 넣는 게 됨
+      //이렇게 될 경우 level 값이 뜨지 않기 때문에 자꾸 admin page가 안 뜬 것 ㅠㅠ!!!!
+      //response.data.user 를 해 줘야!!!! user 안에 level 값이 뜨면서 admin page가 렌더링 될 수 있음!!!
+      //여기서 return 한 값은 extraReducers의 lowinWithEmail.fulfilled 값에 들어간다 ~~
+      //따라서 fulfilled에 있는 값을 response.data가 아니라 response.data.user로 변경해 줘야 함
       return response.data;
       // return response.data.user; 도 가능
     } catch (error) {
@@ -135,7 +141,7 @@ const userSlice = createSlice({
       })
       .addCase(loginWithEmail.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload;
+        state.user = action.payload.user;
         state.loginError = null; //초기화
       })
       .addCase(loginWithEmail.rejected, (state, action) => {
