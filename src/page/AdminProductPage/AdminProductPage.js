@@ -14,7 +14,7 @@ import {
 
 const AdminProductPage = () => {
   const navigate = useNavigate();
-  const [query] = useSearchParams();
+  const [query, setQuery] = useSearchParams();
   const dispatch = useDispatch();
   const { productList, totalPageNum } = useSelector((state) => state.product);
   const [showDialog, setShowDialog] = useState(false);
@@ -37,9 +37,23 @@ const AdminProductPage = () => {
   ];
 
   //상품리스트 가져오기 (url쿼리 맞춰서)
+  //웹페이지 들어오자마자 상품 리스트 보여 줘야 되니까
+  useEffect(() => {
+    dispatch(getProductList({ ...searchQuery })); //searchQuery에 설정해 둔 조건들 함께 보내기
+  }, [query]); //url query가 바뀔 때마다 해당 디스패치 호출
 
   useEffect(() => {
     //검색어나 페이지가 바뀌면 url바꿔주기 (검색어또는 페이지가 바뀜 => url 바꿔줌=> url쿼리 읽어옴=> 이 쿼리값 맞춰서  상품리스트 가져오기)
+    //서치쿼리 없을 수도 있으니까 ~~
+    if (searchQuery.name === '') {
+      delete searchQuery.name;
+    }
+    console.log('search query object', searchQuery);
+    const params = new URLSearchParams(searchQuery);
+    const query = params.toString(); //문자열로 바꿔주기
+    console.log('객체가 쿼리 형태로 바뀌었는지 확인 : ', query); //query를 객체로 변환해 주는 건 URLSearchParams()가 함
+
+    navigate('?' + query); //url 변경
   }, [searchQuery]);
 
   const deleteItem = (id) => {
@@ -63,6 +77,10 @@ const AdminProductPage = () => {
     //  쿼리에 페이지값 바꿔주기
   };
 
+  //searchbox에서 검색어를 읽어온다 => 엔터를 치면 searchQuery 객체가 업데이트 됨
+  //{name : 스트레이트 팬츠} 이런 식으로
+  // => 이 searchQuery 객체 안의 아이템 기준으로 url을 새로 생성해서 다시 호출해 줌 &name=스트레이트+팬츠 이런 식
+  // => url 쿼리 읽어오기 => url쿼리 기준으로 백엔드에 검색 조건과 함께 호출
   return (
     <div className="locate-center">
       <Container>
@@ -80,7 +98,7 @@ const AdminProductPage = () => {
 
         <ProductTable
           header={tableHeader}
-          data=""
+          data={productList}
           deleteItem={deleteItem}
           openEditForm={openEditForm}
         />

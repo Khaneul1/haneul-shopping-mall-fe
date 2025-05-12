@@ -5,7 +5,16 @@ import { showToastMessage } from '../common/uiSlice';
 // 비동기 액션 생성
 export const getProductList = createAsyncThunk(
   'products/getProductList',
-  async (query, { rejectWithValue }) => {}
+  async (query, { rejectWithValue }) => {
+    try {
+      const response = await api.get('/product', { params: { ...query } }); //받은 query 내용을 params에 넣어주겠다
+      if (response.status !== 200) throw new Error(response.error);
+
+      return response.data.data;
+    } catch (error) {
+      rejectWithValue(error.error);
+    }
+  }
 );
 
 export const getProductDetail = createAsyncThunk(
@@ -65,23 +74,38 @@ const productSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(createProduct.pending, (state, action) => {
-      //create 하는 중 : 로딩스피너 보여 주면 좋자나
-      state.loading(true);
-    });
-    builder.addCase(createProduct.fulfilled, (state, action) => {
-      //데이터 받았자나 : 로딩스피너 꺼도 되자나
-      state.loading(false);
-      //에러 있었다? 성공했으면 필요없자나
-      state.error = '';
-      state.success = true; //이거 역할 뭔데요?
-      //상품 생성을 성공했다? 다이얼로그를 닫고, 실패? 실패 메시지를 다이얼로그에 보여주고 닫진 않음
-    });
-    builder.addCase(createProduct.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-      state.success = false;
-    });
+    builder
+      .addCase(createProduct.pending, (state, action) => {
+        //create 하는 중 : 로딩스피너 보여 주면 좋자나
+        state.loading(true);
+      })
+      .addCase(createProduct.fulfilled, (state, action) => {
+        //데이터 받았자나 : 로딩스피너 꺼도 되자나
+        state.loading(false);
+        //에러 있었다? 성공했으면 필요없자나
+        state.error = '';
+        state.success = true; //이거 역할 뭔데요?
+        //상품 생성을 성공했다? 다이얼로그를 닫고, 실패? 실패 메시지를 다이얼로그에 보여주고 닫진 않음
+      })
+      .addCase(createProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.success = false;
+      })
+      .addCase(getProductList.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getProductList.fulfilled, (state, action) => {
+        //성공한 케이스 ~~
+        state.loading = false;
+        //product list 받을 거니까 이걸 저장해 둬야죠 ~~
+        state.productList = action.payload;
+        state.error = ''; //에러 초기화
+      })
+      .addCase(getProductList.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
   },
 });
 

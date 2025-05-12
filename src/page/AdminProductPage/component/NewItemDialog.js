@@ -87,6 +87,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
       dispatch(createProduct({ ...formData, stock: totalStock })); //createProduct에는 formData를 보내 줘야 함
     } else {
       //상품 수정하기
+      
     }
   };
 
