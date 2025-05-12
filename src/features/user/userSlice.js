@@ -25,7 +25,7 @@ export const loginWithEmail = createAsyncThunk(
       //response.data.user 를 해 줘야!!!! user 안에 level 값이 뜨면서 admin page가 렌더링 될 수 있음!!!
       //여기서 return 한 값은 extraReducers의 lowinWithEmail.fulfilled 값에 들어간다 ~~
       //따라서 fulfilled에 있는 값을 response.data가 아니라 response.data.user로 변경해 줘야 함
-      return response.data.user;
+      return response.data;
       // return response.data.user; 도 가능
 
       //return에 response.data.user를 넘겨줄 경우, fulfilled 처리 부분에서는 action.payload 해 줘야 함
@@ -144,7 +144,7 @@ const userSlice = createSlice({
       })
       .addCase(loginWithEmail.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload;
+        state.user = action.payload.user;
         state.loginError = null; //초기화
       })
       .addCase(loginWithEmail.rejected, (state, action) => {

@@ -75,6 +75,9 @@ const AdminProductPage = () => {
 
   const handlePageClick = ({ selected }) => {
     //  쿼리에 페이지값 바꿔주기
+    // 1 페이지를 누르면 콘솔창엔 0이 뜸!!!
+    setSearchQuery({ ...searchQuery, page: selected + 1 }); //이렇게 바꿔주기
+    console.log('선택한 페이지 값', selected);
   };
 
   //searchbox에서 검색어를 읽어온다 => 엔터를 치면 searchQuery 객체가 업데이트 됨
@@ -104,9 +107,9 @@ const AdminProductPage = () => {
         />
         <ReactPaginate
           nextLabel="next >"
-          onPageChange={handlePageClick}
+          onPageChange={handlePageClick} //페이지 바꿀 때마다 handlePageClick 함수 호출
           pageRangeDisplayed={5}
-          pageCount={100}
+          pageCount={totalPageNum} //전체 페이지
           forcePage={searchQuery.page - 1}
           previousLabel="< previous"
           renderOnZeroPageCount={null}

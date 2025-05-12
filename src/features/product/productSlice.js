@@ -8,9 +8,10 @@ export const getProductList = createAsyncThunk(
   async (query, { rejectWithValue }) => {
     try {
       const response = await api.get('/product', { params: { ...query } }); //받은 query 내용을 params에 넣어주겠다
+      console.log('response 확인', response);
       if (response.status !== 200) throw new Error(response.error);
 
-      return response.data.data;
+      return response.data;
     } catch (error) {
       rejectWithValue(error.error);
     }
@@ -99,8 +100,9 @@ const productSlice = createSlice({
         //성공한 케이스 ~~
         state.loading = false;
         //product list 받을 거니까 이걸 저장해 둬야죠 ~~
-        state.productList = action.payload;
+        state.productList = action.payload.data;
         state.error = ''; //에러 초기화
+        state.totalPageNum = action.payload.totalPageNum;
       })
       .addCase(getProductList.rejected, (state, action) => {
         state.loading = false;
