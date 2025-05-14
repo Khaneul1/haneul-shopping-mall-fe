@@ -33,6 +33,7 @@ export const createProduct = createAsyncThunk(
       dispatch(
         showToastMessage({ message: '상품 생성 완료', status: 'success' })
       );
+      dispatch(getProductList({ page: 1 }));
       return response.data.data;
     } catch (error) {
       console.log('상품 생성 실패...');
@@ -43,12 +44,40 @@ export const createProduct = createAsyncThunk(
 
 export const deleteProduct = createAsyncThunk(
   'products/deleteProduct',
-  async (id, { dispatch, rejectWithValue }) => {}
+  async (id, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await api.delete('/product/${id');
+      if (response.status !== 200) throw new Error(response.error);
+
+      dispatch(
+        showToastMessage({ message: '상품 삭제 완료', status: 'success' })
+      );
+      dispatch(getProductList({ page: 1 }));
+      return id;
+    } catch (error) {
+      dispatch(
+        showToastMessage({ message: '상품 삭제 실패', status: 'error' })
+      );
+      return rejectWithValue(
+        error.error || '상품 삭제 중 오류가 발생했습니다.'
+      );
+    }
+  }
 );
 
 export const editProduct = createAsyncThunk(
   'products/editProduct',
-  async ({ id, ...formData }, { dispatch, rejectWithValue }) => {}
+  async ({ id, ...formData }, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await api.put('/product/${id}', formData);
+      if (response.status !== 200) throw new Error(response.error);
+      dispatch(getProductList({ page: 1 }));
+
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(error.error);
+    }
+  }
 );
 
 // 슬라이스 생성
@@ -106,6 +135,33 @@ const productSlice = createSlice({
       })
       .addCase(getProductList.rejected, (state, action) => {
         state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(editProduct.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(editProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = '';
+        //edit이 성공하면 팝업 닫아주기 (거의 createProduct와 로직이 똑같음)
+        state.success = true;
+      })
+      .addCase(editProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.success = false;
+      })
+      .addCase(deleteProduct.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.error = '';
+      })
+      .addCase(deleteProduct.rejected, (state, action) => {
+        state.loading = false;
+        state.success = false;
         state.error = action.payload;
       });
   },

@@ -57,12 +57,18 @@ const AdminProductPage = () => {
   }, [searchQuery]);
 
   const deleteItem = (id) => {
-    //아이템 삭제하가ㅣ
+    //아이템 삭제하기
   };
 
   const openEditForm = (product) => {
     //edit모드로 설정하고
+    setMode('edit');
+    //다이얼로그 열어주기 전에 선택한 아이템 세팅을 먼저 해 줘야 함!
+    dispatch(setSelectedProduct(product)); //선택한 아이템 저장만 하는 것!!
+    //thunk 사용 불필요. 바로 reducer에 저장해 주면 됨
+
     // 아이템 수정다이얼로그 열어주기
+    setShowDialog(true);
   };
 
   const handleClickNewItem = () => {
