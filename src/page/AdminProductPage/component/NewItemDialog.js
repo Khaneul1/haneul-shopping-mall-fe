@@ -82,6 +82,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
       return { ...total, [item[0]]: parseInt(item[1]) };
     }, {});
     console.log('form data total stock', totalStock);
+
     if (mode === 'new') {
       //새 상품 만들기
       dispatch(createProduct({ ...formData, stock: totalStock })); //createProduct에는 formData를 보내 줘야 함
@@ -93,27 +94,29 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
     }
   };
 
-  // 배열을 객체로 전환하기
-  const stockObject = {};
-  stock.forEach(([size, quantity]) => {
-    if (size) {
-      stockObject[size] = quantity;
+  useEffect(() => {
+    // 배열을 객체로 전환하기
+    const stockObject = {};
+    stock.forEach(([size, quantity]) => {
+      if (size) {
+        stockObject[size] = quantity;
+      }
+    });
+
+    // 전체 데이터 구성
+    const payload = {
+      ...formData, //{title:'청바지', description: '블루진}
+      stock: stockObject, //{S:10, M:4}
+    };
+
+    if (mode === 'new') {
+      //새 상품 만들기
+      dispatch(createProduct(payload));
+    } else {
+      // 상품 수정하기
+      dispatch(editProduct({ ...payload, id: selectedProduct._id }));
     }
-  });
-
-  // 전체 데이터 구성
-  const payload = {
-    ...formData, //{title:'청바지', description: '블루진}
-    stock: stockObject, //{S:10, M:4}
-  };
-
-  if (mode === 'new') {
-    //새 상품 만들기
-    dispatch(createProduct(payload));
-  } else {
-    // 상품 수정하기
-    dispatch(editProduct({ ...payload, id: selectedProduct._id }));
-  }
+  }, []);
 
   const handleChange = (event) => {
     //form에 데이터 넣어주기
