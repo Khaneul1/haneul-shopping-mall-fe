@@ -9,7 +9,6 @@ import {
   createProduct,
   editProduct,
 } from '../../../features/product/productSlice';
-import { update } from '@react-spring/web';
 
 const InitialFormData = {
   name: '',
