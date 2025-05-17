@@ -1,33 +1,36 @@
-import React, { useState, useEffect } from "react";
-import { Container, Row, Col, Form, Button } from "react-bootstrap";
-import { useNavigate } from "react-router";
-import { useSelector, useDispatch } from "react-redux";
-import OrderReceipt from "./component/OrderReceipt";
-import PaymentForm from "./component/PaymentForm";
-import "./style/paymentPage.style.css";
-import { cc_expires_format } from "../../utils/number";
-import { createOrder } from "../../features/order/orderSlice";
+import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, Form, Button } from 'react-bootstrap';
+import { useNavigate } from 'react-router';
+import { useSelector, useDispatch } from 'react-redux';
+import OrderReceipt from './component/OrderReceipt';
+import PaymentForm from './component/PaymentForm';
+import './style/paymentPage.style.css';
+import { cc_expires_format } from '../../utils/number';
+import { createOrder, getOrderList } from '../../features/order/orderSlice';
 
 const PaymentPage = () => {
   const dispatch = useDispatch();
   const { orderNum } = useSelector((state) => state.order);
   const [cardValue, setCardValue] = useState({
-    cvc: "",
-    expiry: "",
-    focus: "",
-    name: "",
-    number: "",
+    cvc: '',
+    expiry: '',
+    focus: '',
+    name: '',
+    number: '',
   });
   const navigate = useNavigate();
   const [firstLoading, setFirstLoading] = useState(true);
   const [shipInfo, setShipInfo] = useState({
-    firstName: "",
-    lastName: "",
-    contact: "",
-    address: "",
-    city: "",
-    zip: "",
+    firstName: '',
+    lastName: '',
+    contact: '',
+    address: '',
+    city: '',
+    zip: '',
   });
+  const { cartList, totalPrice } = useSelector((state) => state.cart);
+
+  console.log('shipinfo', shipInfo);
 
   useEffect(() => {
     // 오더번호를 받으면 어디로 갈까?
@@ -36,22 +39,49 @@ const PaymentPage = () => {
   const handleSubmit = (event) => {
     event.preventDefault();
     // 오더 생성하기
+    const { firstName, lastName, contact, address, city, zip } = shipInfo;
+    dispatch(
+      createOrder({
+        totalPrice,
+        shipTo: { address, city, zip },
+        contact: { firstName, lastName, contact },
+        getOrderList: cartList.map((item) => {
+          return {
+            productId: item.productId._id,
+            price: item.productId.price,
+            qty: item.qty,
+            size: item.size,
+          };
+        }),
+      })
+    );
   };
 
   const handleFormChange = (event) => {
     //shipInfo에 값 넣어주기
+    const { name, value } = event.target;
+    setShipInfo({ ...shipInfo, [name]: value });
   };
 
   const handlePaymentInfoChange = (event) => {
     //카드정보 넣어주기
+    const { name, value } = event.target;
+    if (name === 'expriy') {
+      let newValue = cc_expires_format(value);
+      setCardValue({ ...cardValue, [name]: newValue });
+      return;
+    }
+    setCardValue({ ...cardValue, [name]: value });
   };
 
   const handleInputFocus = (e) => {
     setCardValue({ ...cardValue, focus: e.target.name });
   };
-  // if (cartList?.length === 0) {
-  //   navigate("/cart");
-  // }// 주문할 아이템이 없다면 주문하기로 안넘어가게 막음
+  //카트에 아이템이 없다면 다시 카트 페이지로 돌아가기
+  //결제할 아이템이 없으면 결제 페이지로 들어가면 안 되기 때문!!
+  if (cartList?.length === 0) {
+    navigate('/cart');
+  } // 주문할 아이템이 없다면 주문하기로 안넘어가게 막음
   return (
     <Container>
       <Row>
@@ -122,10 +152,15 @@ const PaymentPage = () => {
                   </Form.Group>
                 </Row>
                 <div className="mobile-receipt-area">
-                  {/* <OrderReceipt /> */}
+                  <OrderReceipt cartList={cartList} totalPrice={totalPrice} />
                 </div>
                 <div>
                   <h2 className="payment-title">결제 정보</h2>
+                  <PaymentForm
+                    cardValue={cardValue}
+                    handleInputFocus={handleInputFocus}
+                    handlePaymentInfoChange={handlePaymentInfoChange}
+                  />
                 </div>
 
                 <Button
@@ -140,7 +175,7 @@ const PaymentPage = () => {
           </div>
         </Col>
         <Col lg={5} className="receipt-area">
-          {/* <OrderReceipt  /> */}
+          <OrderReceipt cartList={cartList} totalPrice={totalPrice} />
         </Col>
       </Row>
     </Container>
