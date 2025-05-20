@@ -31,6 +31,7 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
   const [stock, setStock] = useState([]);
   const dispatch = useDispatch();
   const [stockError, setStockError] = useState(false);
+  console.log('stock check', stock);
 
   useEffect(() => {
     if (success) setShowDialog(false);
@@ -92,30 +93,6 @@ const NewItemDialog = ({ mode, showDialog, setShowDialog }) => {
       );
     }
   };
-
-  useEffect(() => {
-    // 배열을 객체로 전환하기
-    const stockObject = {};
-    stock.forEach(([size, quantity]) => {
-      if (size) {
-        stockObject[size] = quantity;
-      }
-    });
-
-    // 전체 데이터 구성
-    const payload = {
-      ...formData, //{title:'청바지', description: '블루진}
-      stock: stockObject, //{S:10, M:4}
-    };
-
-    if (mode === 'new') {
-      //새 상품 만들기
-      dispatch(createProduct(payload));
-    } else {
-      // 상품 수정하기
-      dispatch(editProduct({ ...payload, id: selectedProduct._id }));
-    }
-  }, []);
 
   const handleChange = (event) => {
     //form에 데이터 넣어주기

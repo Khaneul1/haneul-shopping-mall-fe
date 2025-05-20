@@ -46,7 +46,7 @@ export const loginWithGoogle = createAsyncThunk(
 
 export const logout = () => (dispatch) => {
   sessionStorage.removeItem('token'); //저장된 토큰 삭제
-  dispatch(initialCart()); //장바구나 초기화
+  dispatch(initialCart()); //장바구니 초기화
   dispatch(userSlice.actions.setUser(null)); //사용자 정보 제거
 };
 
