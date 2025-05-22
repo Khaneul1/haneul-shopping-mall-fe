@@ -20,7 +20,15 @@ export const getProductList = createAsyncThunk(
 
 export const getProductDetail = createAsyncThunk(
   'products/getProductDetail',
-  async (id, { rejectWithValue }) => {}
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await api.get(`/product/${id}`);
+      if (response.status !== 200) throw new Error(response.error);
+      return response.data.data;
+    } catch (error) {
+      rejectWithValue(error.error);
+    }
+  }
 );
 
 export const createProduct = createAsyncThunk(
@@ -107,11 +115,11 @@ const productSlice = createSlice({
     builder
       .addCase(createProduct.pending, (state, action) => {
         //create 하는 중 : 로딩스피너 보여 주면 좋자나
-        state.loading(true);
+        state.loading = true;
       })
       .addCase(createProduct.fulfilled, (state, action) => {
         //데이터 받았자나 : 로딩스피너 꺼도 되자나
-        state.loading(false);
+        state.loading = false;
         //에러 있었다? 성공했으면 필요없자나
         state.error = '';
         state.success = true; //이거 역할 뭔데요?
@@ -156,12 +164,24 @@ const productSlice = createSlice({
       })
       .addCase(deleteProduct.fulfilled, (state, action) => {
         state.loading = false;
-        state.success = true;
+        // state.success = true;
         state.error = '';
       })
       .addCase(deleteProduct.rejected, (state, action) => {
         state.loading = false;
-        state.success = false;
+        // state.success = false;
+        state.error = action.payload;
+      })
+      .addCase(getProductDetail.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getProductDetail.fulfilled, (state, action) => {
+        state.loading = false;
+        state.selectedProduct = action.payload;
+        state.error = '';
+      })
+      .addCase(getProductDetail.rejected, (state, action) => {
+        state.loading = false;
         state.error = action.payload;
       });
   },
