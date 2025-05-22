@@ -15,9 +15,9 @@ const initialState = {
 // Async thunk actions
 export const addToCart = createAsyncThunk(
   'cart/addToCart',
-  async ({ productId, size }, { rejectWithValue, dispatch }) => {
+  async ({ id, size }, { rejectWithValue, dispatch }) => {
     try {
-      const response = await api.post('/cart', { productId, size, qty: 1 }); //qty == 개수 (일단 1로 기본값 설정)
+      const response = await api.post('/cart', { productId: id, size, qty: 1 }); //qty == 개수 (일단 1로 기본값 설정)
       if (response.status !== 200) throw new Error(response.error);
       dispatch(
         showToastMessage({
@@ -44,6 +44,7 @@ export const getCartList = createAsyncThunk(
     try {
       const response = await api.get('/cart');
       if (response.status !== 200) throw new Error(response.error);
+      console.log('cart response', response.data);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.error);

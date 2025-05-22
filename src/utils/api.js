@@ -4,6 +4,10 @@ const LOCAL_BACKEND = process.env.REACT_APP_LOCAL_BACKEND;
 // const PROD_BACKEND = process.env.REACT_APP_PROD_BACKEND;
 // const BACKEND_PROXY = process.env.REACT_APP_BACKEND_PROXY;
 // console.log("proxy", BACKEND_PROXY);
+
+//여기에 api 선언하는 것!!!!!
+//localhost 어쩌고저쩌고를 함축시켜 주려고 이게 있는 것
+//데이터 호출할 때마다 토큰값 불러와 줘야 하는데 여기다 지정해 뒀으니까 ~~.. 짧게 해도 ㄱㅊ
 const api = axios.create({
   baseURL: LOCAL_BACKEND,
   headers: {

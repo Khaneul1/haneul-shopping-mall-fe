@@ -46,8 +46,7 @@ export const loginWithGoogle = createAsyncThunk(
 
 export const logout = () => (dispatch) => {
   sessionStorage.removeItem('token'); //저장된 토큰 삭제
-  dispatch(initialCart()); //장바구니 초기화
-  dispatch(userSlice.actions.setUser(null)); //사용자 정보 제거
+  dispatch(deleteUserData()); //사용자 정보 제거
 };
 
 export const registerUser = createAsyncThunk(
@@ -89,6 +88,7 @@ export const registerUser = createAsyncThunk(
   }
 );
 
+//새로고침해도 로그인이 남아있도록 하는 함수
 export const loginWithToken = createAsyncThunk(
   'user/loginWithToken',
   async (_, { rejectWithValue }) => {
@@ -97,7 +97,7 @@ export const loginWithToken = createAsyncThunk(
     // 저장해 둔 토큰
     try {
       const response = await api.get('/user/me');
-      console.log('토큰 로그인 결과: ', response.data);
+      console.log('토큰 로그인 결과: ', response.data.user);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.error);
@@ -115,13 +115,14 @@ const userSlice = createSlice({
     success: false,
   },
   // reducers : async 없이 직접적으로 호출할 때
+  // 비동기 작업을 안 하는데 전역변수를 쓸 때 사용
   reducers: {
     clearErrors: (state) => {
       state.loginError = null;
       state.registrationError = null;
     },
-    setUser: (state, action) => {
-      state.user = action.payload;
+    deleteUserData: (state) => {
+      state.user = null; //로그아웃 시 저장되어 있던 유저 정보 삭제
     },
   },
   // async처럼 외부 함수를 통해 호출되는 경우
@@ -157,7 +158,7 @@ const userSlice = createSlice({
       // }) // 그래서 지워 줍니다
       .addCase(loginWithToken.fulfilled, (state, action) => {
         // 성공 시 아래와 같이 세팅
-        state.user = action.payload;
+        state.user = action.payload.user;
       });
     // .addCase(loginWithToken.rejected, (state, action) => {
     //   // 만약 실패했다면 > 다시 로그인 페이지 보여 주면 되잖아요?
@@ -165,5 +166,5 @@ const userSlice = createSlice({
     // });
   },
 });
-export const { clearErrors } = userSlice.actions;
+export const { clearErrors, deleteUserData } = userSlice.actions;
 export default userSlice.reducer;
