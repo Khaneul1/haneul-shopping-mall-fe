@@ -54,7 +54,26 @@ export const getCartList = createAsyncThunk(
 
 export const deleteCartItem = createAsyncThunk(
   'cart/deleteCartItem',
-  async (id, { rejectWithValue, dispatch }) => {}
+  async (id, { rejectWithValue, dispatch }) => {
+    try {
+      const response = await api.delete(`/cart/${id}`);
+      if (response.status !== 200) throw new Error(response.error);
+      console.log('delete cart item', response.data);
+      dispatch(
+        showToastMessage({
+          message: '상품이 삭제되었습니다',
+          status: 'success',
+        })
+      );
+      dispatch(getCartList);
+      return response.data.cartItemCount;
+    } catch (error) {
+      dispatch(
+        showToastMessage({ message: '상품 삭제 실패', status: 'error' })
+      );
+      return rejectWithValue(error.error);
+    }
+  }
 );
 
 export const updateQty = createAsyncThunk(
@@ -108,6 +127,18 @@ const cartSlice = createSlice({
       //로직이 되게 간단해 보이지만, cartList에 아이템이 많아지면 계산하는 데 시간이 걸림
       //저장하고 쓰는 게 낫겠다~~ 싶어서 리듀서에 넣은 것!! 한 번 계산하고 가져다 쓸 수 있도록!!
       .addCase(getCartList.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(deleteCartItem.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(deleteCartItem.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = '';
+        state.cartItemCount = action.payload;
+      })
+      .addCase(deleteCartItem.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
