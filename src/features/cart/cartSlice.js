@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../../utils/api';
 import { showToastMessage } from '../common/uiSlice';
 import { act } from 'react';
+import ToastMessage from '../../common/component/ToastMessage';
 
 const initialState = {
   loading: false,
@@ -76,14 +77,34 @@ export const deleteCartItem = createAsyncThunk(
   }
 );
 
+//기찬 오빠 코드 참고 ㅎ...
 export const updateQty = createAsyncThunk(
   'cart/updateQty',
-  async ({ id, value }, { rejectWithValue }) => {}
+  async ({ id, value }, { rejectWithValue }) => {
+    try {
+      const response = await api.put(`/cart/${id}`, { qty: value });
+      console.log('오빠 감사합니다', response);
+      if (response.status !== 200) throw new Error(response.error);
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(error.error);
+    }
+  }
 );
 
 export const getCartQty = createAsyncThunk(
   'cart/getCartQty',
-  async (_, { rejectWithValue, dispatch }) => {}
+  async (_, { rejectWithValue, dispatch }) => {
+    try {
+      const response = await api.get('/cart/qty');
+      console.log('get cart qty', response.data);
+      if (response.status !== 200) throw new Error(response.error);
+      //dispatch(getCartList());
+      return response.data.cartItemCount;
+    } catch (error) {
+      return rejectWithValue(error.error);
+    }
+  }
 );
 
 const cartSlice = createSlice({
@@ -140,6 +161,34 @@ const cartSlice = createSlice({
       })
       .addCase(deleteCartItem.rejected, (state, action) => {
         state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateQty.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(updateQty.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = '';
+        state.cartList = action.payload;
+        state.totalPrice = action.payload.reduce(
+          (total, item) => total + item.productId.price * item.qty,
+          0
+        );
+      })
+      .addCase(updateQty.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(getCartQty.pending, (state, action) => {
+        state.loading = true;
+      })
+      .addCase(getCartQty.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = '';
+        state.cartItemCount = action.payload;
+      })
+      .addCase(getCartQty.rejected, (state, action) => {
+        state.loading = true;
         state.error = action.payload;
       });
   },

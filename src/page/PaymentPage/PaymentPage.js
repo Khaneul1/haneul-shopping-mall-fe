@@ -45,7 +45,7 @@ const PaymentPage = () => {
         totalPrice,
         shipTo: { address, city, zip },
         contact: { firstName, lastName, contact },
-        getOrderList: cartList.map((item) => {
+        orderList: cartList.map((item) => {
           return {
             productId: item.productId._id,
             price: item.productId.price,
