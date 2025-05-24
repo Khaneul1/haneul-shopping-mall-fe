@@ -16,6 +16,10 @@ const CartPage = () => {
     dispatch(getCartList());
   }, []);
 
+  useEffect(() => {
+    console.log('cart list', cartList);
+  }, [cartList]);
+
   return (
     <Container>
       <Row>

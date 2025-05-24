@@ -44,7 +44,7 @@ export const getCartList = createAsyncThunk(
     try {
       const response = await api.get('/cart');
       if (response.status !== 200) throw new Error(response.error);
-      console.log('cart response', response.data);
+      console.log('cart response', response);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.error);
@@ -56,16 +56,16 @@ export const deleteCartItem = createAsyncThunk(
   'cart/deleteCartItem',
   async (id, { rejectWithValue, dispatch }) => {
     try {
-      const response = await api.delete(`/cart/${id}`);
+      const response = await api.delete(`/cart/${id}`); //id=1234
       if (response.status !== 200) throw new Error(response.error);
-      console.log('delete cart item', response.data);
+
       dispatch(
         showToastMessage({
           message: '상품이 삭제되었습니다',
           status: 'success',
         })
       );
-      dispatch(getCartList);
+      dispatch(getCartList());
       return response.data.cartItemCount;
     } catch (error) {
       dispatch(
