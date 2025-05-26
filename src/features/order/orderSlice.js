@@ -22,7 +22,7 @@ export const createOrder = createAsyncThunk(
     try {
       const response = await api.post('/order', payload);
       console.log('create order responseee', response);
-      if (response.status !== 200) throw new Error(response.error);
+      // if (response.status !== 200) throw new Error(response.error);
       dispatch(getCartQty());
       return response.data.orderNum;
     } catch (error) {
@@ -38,7 +38,7 @@ export const getOrder = createAsyncThunk(
     try {
       const response = await api.get('/order/me');
       console.log('getOrder', response.data);
-      if (response.status !== 200) throw new Error(response.error);
+      // if (response.status !== 200) throw new Error(response.error);
 
       return response.data;
     } catch (error) {
@@ -54,7 +54,7 @@ export const getOrderList = createAsyncThunk(
     try {
       const response = await api.get('/order', { params: query });
 
-      if (response.status !== 200) throw new Error(response.error);
+      // if (response.status !== 200) throw new Error(response.error);
       console.log('get orer', response);
       return response.data;
     } catch (error) {
@@ -69,7 +69,7 @@ export const updateOrder = createAsyncThunk(
   async ({ id, status }, { dispatch, rejectWithValue }) => {
     try {
       const response = await api.put(`/order/${id}`, { status });
-      if (response.status !== 200) throw new Error(response.error);
+      // if (response.status !== 200) throw new Error(response.error);
       dispatch(getOrderList());
     } catch (error) {
       return rejectWithValue(error.error);

@@ -19,7 +19,7 @@ export const addToCart = createAsyncThunk(
   async ({ id, size }, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.post('/cart', { productId: id, size, qty: 1 }); //qty == 개수 (일단 1로 기본값 설정)
-      if (response.status !== 200) throw new Error(response.error);
+      // if (response.status !== 200) throw new Error(response.error);
       dispatch(
         showToastMessage({
           message: '카트에 아이템이 추가됐습니다',
@@ -44,7 +44,7 @@ export const getCartList = createAsyncThunk(
   async (_, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.get('/cart');
-      if (response.status !== 200) throw new Error(response.error);
+      // if (response.status !== 200) throw new Error(response.error);
       console.log('cart response', response);
       return response.data.data;
     } catch (error) {
@@ -58,7 +58,7 @@ export const deleteCartItem = createAsyncThunk(
   async (id, { rejectWithValue, dispatch }) => {
     try {
       const response = await api.delete(`/cart/${id}`); //id=1234
-      if (response.status !== 200) throw new Error(response.error);
+      // if (response.status !== 200) throw new Error(response.error);
 
       dispatch(
         showToastMessage({
@@ -84,7 +84,7 @@ export const updateQty = createAsyncThunk(
     try {
       const response = await api.put(`/cart/${id}`, { qty: value });
       console.log('오빠 감사합니다', response);
-      if (response.status !== 200) throw new Error(response.error);
+      // if (response.status !== 200) throw new Error(response.error);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.error);
@@ -98,7 +98,7 @@ export const getCartQty = createAsyncThunk(
     try {
       const response = await api.get('/cart/qty');
       console.log('get cart qty', response.data);
-      if (response.status !== 200) throw new Error(response.error);
+      // if (response.status !== 200) throw new Error(response.error);
       //dispatch(getCartList());
       return response.data.cartItemCount;
     } catch (error) {

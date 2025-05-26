@@ -9,8 +9,11 @@ export const getProductList = createAsyncThunk(
     try {
       const response = await api.get('/product', { params: { ...query } }); //받은 query 내용을 params에 넣어주겠다
       console.log('response 확인', response);
-      if (response.status !== 200) throw new Error(response.error);
-
+      // if (response.status !== 200) throw new Error(response.error);
+      //위의 로직 지워 줘도 됨!!
+      //api 호출 : axios 라이브러리 통해 호출...
+      //그래서 해당 라이브러리가 위의 코드를 넣어 주지 않더라도 자동으로 넣어 줌!!
+      //그래서 전부 ~~ 정리해 줘도 됩니당
       return response.data;
     } catch (error) {
       rejectWithValue(error.error);
@@ -23,7 +26,7 @@ export const getProductDetail = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await api.get(`/product/${id}`);
-      if (response.status !== 200) throw new Error(response.error);
+      // if (response.status !== 200) throw new Error(response.error);
       return response.data.data;
     } catch (error) {
       rejectWithValue(error.error);
@@ -37,7 +40,7 @@ export const createProduct = createAsyncThunk(
     try {
       const response = await api.post('/product', formData);
 
-      if (response.status !== 200) throw new Error(response.error);
+      // if (response.status !== 200) throw new Error(response.error);
       dispatch(
         showToastMessage({ message: '상품 생성 완료', status: 'success' })
       );
@@ -55,7 +58,7 @@ export const deleteProduct = createAsyncThunk(
   async (id, { dispatch, rejectWithValue }) => {
     try {
       const response = await api.delete(`/product/${id}`);
-      if (response.status !== 200) throw new Error(response.error);
+      // if (response.status !== 200) throw new Error(response.error);
 
       dispatch(
         showToastMessage({ message: '상품 삭제 완료', status: 'success' })
@@ -78,7 +81,7 @@ export const editProduct = createAsyncThunk(
   async ({ id, ...formData }, { dispatch, rejectWithValue }) => {
     try {
       const response = await api.put(`/product/${id}`, formData);
-      if (response.status !== 200) throw new Error(response.error);
+      // if (response.status !== 200) throw new Error(response.error);
       dispatch(getProductList({ page: 1 }));
 
       return response.data.data;
