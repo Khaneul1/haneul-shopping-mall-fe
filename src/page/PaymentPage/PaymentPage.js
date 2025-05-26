@@ -35,6 +35,8 @@ const PaymentPage = () => {
   useEffect(() => {
     // 오더번호를 받으면 어디로 갈까?
     if (firstLoading) {
+      //해당 if문을 작성하지 않을 시 결제하기 버튼 누르면 주문 완료 페이지로 넘어가버림!!
+      //결제하고 주문 완료 페이지가 렌더링 되어야 하자나요?
       //useEffect가 처음에 호출될 때 오더 성공 페이지로 넘어가는 걸 막기 위해
       setFirstLoading(false);
     } else {

@@ -3,6 +3,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { showToastMessage } from '../common/uiSlice';
 import api from '../../utils/api';
 import { initialCart } from '../cart/cartSlice';
+import { responsive } from '@cloudinary/react';
 
 export const loginWithEmail = createAsyncThunk(
   'user/loginWithEmail',
@@ -41,7 +42,19 @@ export const loginWithEmail = createAsyncThunk(
 
 export const loginWithGoogle = createAsyncThunk(
   'user/loginWithGoogle',
-  async (token, { rejectWithValue }) => {}
+  async (token, { rejectWithValue }) => {
+    //credential == token
+    // try {
+    //   //구글 로그인 부르기
+    //   const response = await api.post('/auth/google', { token });
+    //   sessionStorage.setItem('token', response.data.token);
+    //   //구글 로그인 성공시 결론적으로 서버에서 받는 응답값은 같아야 함!!
+    //   //일반 로그인과 구글 로그인 전부 동일!! user 정보 넣어 주기
+    //   return response.data;
+    // } catch (error) {
+    //   return rejectWithValue(error.error);
+    // }
+  }
 );
 
 export const logout = () => (dispatch) => {
@@ -163,6 +176,18 @@ const userSlice = createSlice({
     // .addCase(loginWithToken.rejected, (state, action) => {
     //   // 만약 실패했다면 > 다시 로그인 페이지 보여 주면 되잖아요?
     //   // 그래서 얘도 딱히 필요없음
+    // });
+    // .addCase(loginWithGoogle.pending, (state, action) => {
+    //   state.loading = true;
+    // })
+    // .addCase(loginWithGoogle.fulfilled, (state, action) => {
+    //   state.loading = false;
+    //   state.user = action.payload.user;
+    //   state.loginError = null;
+    // })
+    // .addCase(loginWithGoogle.rejected, (state, action) => {
+    //   state.loading = false;
+    //   state.loginError = action.payload;
     // });
   },
 });
