@@ -1,16 +1,16 @@
-import React from 'react';
-import { useEffect } from 'react';
-import { Container } from 'react-bootstrap';
-import { useDispatch, useSelector } from 'react-redux';
-import OrderStatusCard from './component/OrderStatusCard';
-import './style/orderStatus.style.css';
-import { getOrder } from '../../features/order/orderSlice';
+import React from "react";
+import { useEffect } from "react";
+import { Container } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import OrderStatusCard from "./component/OrderStatusCard";
+import "./style/orderStatus.style.css";
+import { getOrder } from "../../features/order/orderSlice";
 
 const MyPage = () => {
   const dispatch = useDispatch();
   const { orderList } = useSelector((state) => state.order);
   console.log(orderList);
-
+  
   useEffect(() => {
     dispatch(getOrder());
   }, [dispatch]);

@@ -11,24 +11,30 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../../features/user/userSlice';
+import { setSelectedCategory } from '../../features/product/productSlice';
+import { CATEGORY } from '../../constants/product.constants';
 
 const Navbar = ({ user }) => {
   console.log('Navbar user 정보:', user);
 
   const dispatch = useDispatch();
+  const selectedCategory = useSelector(
+    (state) => state.product.selectedCategory
+  );
+
   const { cartItemCount } = useSelector((state) => state.cart);
   const isMobile = window.navigator.userAgent.indexOf('Mobile') !== -1;
   const [showSearchBox, setShowSearchBox] = useState(false);
-  const menuList = [
-    '여성',
-    'Divided',
-    '남성',
-    '신생아/유아',
-    '아동',
-    'H&M HOME',
-    'Sale',
-    '지속가능성',
-  ];
+  // const menuList = [
+  //   'Top',
+  //   'Dress',
+  //   '남성',
+  //   '신생아/유아',
+  //   '아동',
+  //   'H&M HOME',
+  //   'Sale',
+  //   '지속가능성',
+  // ];
   let [width, setWidth] = useState(0);
   let navigate = useNavigate();
   const onCheckEnter = (event) => {
@@ -46,6 +52,12 @@ const Navbar = ({ user }) => {
   useEffect(() => {
     console.log('user info', user);
   }, [user]);
+
+  const handleMenuClick = (category) => {
+    const selected = category === '전체' ? '' : category;
+    dispatch(setSelectedCategory(selected));
+    // dispatch(getProductList({ category: selected, page: 1 }));
+  };
 
   return (
     <div>
@@ -75,8 +87,10 @@ const Navbar = ({ user }) => {
         </button>
 
         <div className="side-menu-list" id="menu-list">
-          {menuList.map((menu, index) => (
-            <button key={index}>{menu}</button>
+          {CATEGORY.map((category) => (
+            <button key={category} onClick={() => handleMenuClick(category)}>
+              {category}
+            </button>
           ))}
         </div>
       </div>
@@ -136,7 +150,7 @@ const Navbar = ({ user }) => {
       </div>
       <div className="nav-menu-area">
         <ul className="menu">
-          {menuList.map((menu, index) => (
+          {CATEGORY.map((menu, index) => (
             <li key={index}>
               <a href="#">{menu}</a>
             </li>

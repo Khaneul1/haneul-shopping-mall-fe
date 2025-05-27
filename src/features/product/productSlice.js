@@ -101,6 +101,7 @@ const productSlice = createSlice({
     error: '',
     totalPageNum: 1,
     success: false,
+    selectedCategory: '',
   },
   reducers: {
     setSelectedProduct: (state, action) => {
@@ -112,6 +113,9 @@ const productSlice = createSlice({
     clearError: (state) => {
       state.error = '';
       state.success = false;
+    },
+    setSelectedCategory: (state, action) => {
+      state.selectedCategory = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -190,6 +194,10 @@ const productSlice = createSlice({
   },
 });
 
-export const { setSelectedProduct, setFilteredList, clearError } =
-  productSlice.actions;
+export const {
+  setSelectedProduct,
+  setFilteredList,
+  clearError,
+  setSelectedCategory,
+} = productSlice.actions;
 export default productSlice.reducer;
