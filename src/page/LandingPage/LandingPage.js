@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import ProductCard from './components/ProductCard';
 import { Row, Col, Container } from 'react-bootstrap';
 import { useSearchParams } from 'react-router-dom';
@@ -9,27 +9,13 @@ const LandingPage = () => {
   const dispatch = useDispatch();
 
   const productList = useSelector((state) => state.product.productList);
-  const selectedCategory = useSelector(
-    (state) => state.product.selectedCategory
-  );
 
   const [query] = useSearchParams();
-  const name = query.get('name');
-  const [category, setCategory] = useState('');
+  const name = query.get('name') || '';
 
   useEffect(() => {
-    dispatch(
-      getProductList({
-        name,
-        category: selectedCategory,
-      })
-    );
-  }, [query, category, dispatch, selectedCategory]);
-
-  const handleCateGoryChange = (event) => {
-    setCategory(event.target.value);
-  };
-
+    dispatch(getProductList(name));
+  }, [query, name]);
   return (
     <Container>
       <Row>
@@ -44,7 +30,7 @@ const LandingPage = () => {
             {name === '' ? (
               <h2>등록된 상품이 없습니다!</h2>
             ) : (
-              <h2>{name}과 일치한 상품이 없습니다!`</h2>
+              <h2>{name}과 일치한 상품이 없습니다!</h2>
             )}
           </div>
         )}

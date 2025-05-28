@@ -1,13 +1,19 @@
-import React from "react";
-import { Col, Form, Row } from "react-bootstrap";
-import Cards from "react-credit-cards-2";
-import "react-credit-cards-2/dist/es/styles-compiled.css";
+import React from 'react';
+import { Col, Form, Row, Button, InputGroup } from 'react-bootstrap';
+import Cards from 'react-credit-cards-2';
+import 'react-credit-cards-2/dist/es/styles-compiled.css';
 
-const PaymentForm = ({
+function PaymentForm({
   handleInputFocus,
   cardValue,
   handlePaymentInfoChange,
-}) => {
+  couponCode,
+  setCouponCode,
+  handleApplyCoupon,
+  discountRate,
+  discountedPriece,
+  totalPrice,
+}) {
   return (
     <Row className="display-flex">
       <Col md={6} xs={12}>
@@ -70,8 +76,19 @@ const PaymentForm = ({
           </Row>
         </div>
       </Col>
+      <PaymentForm
+        cardValue={cardValue}
+        handleInputFocus={handleInputFocus}
+        handlePaymentInfoChange={handlePaymentInfoChange}
+        couponCode={couponCode}
+        setCouponCode={setCouponCode}
+        handleApplyCoupon={handleApplyCoupon}
+        discountRate={discountRate}
+        discountedPrice={discountedPriece}
+        totalPrice={totalPrice}
+      />
     </Row>
   );
-};
+}
 
 export default PaymentForm;

@@ -29,6 +29,9 @@ const PaymentPage = () => {
     zip: '',
   });
   const { cartList, totalPrice } = useSelector((state) => state.cart);
+  const [couponCode, setCouponCode] = useState('');
+  const [discountRate, setDiscounRate] = useState(0);
+  const [discountedPriece, setDiscountedPrice] = useState(totalPrice);
 
   console.log('shipinfo', shipInfo);
 
@@ -52,7 +55,7 @@ const PaymentPage = () => {
     const { firstName, lastName, contact, address, city, zip } = shipInfo;
     dispatch(
       createOrder({
-        totalPrice,
+        totalPrice: discountedPriece,
         shipTo: { address, city, zip },
         contact: { firstName, lastName, contact },
         orderList: cartList.map((item) => {
@@ -92,6 +95,32 @@ const PaymentPage = () => {
   if (cartList?.length === 0) {
     navigate('/cart');
   } // 주문할 아이템이 없다면 주문하기로 안넘어가게 막음
+
+  const applyCoupon = async () => {
+    try {
+      const res = await fetch('/api/coupon/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: couponCode }),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        setDiscounRate(data.discountRate);
+        const discounted = totalPrice - (totalPrice * data.discountRate) / 100;
+        setDiscountedPrice(discounted);
+        alert(`쿠폰이 적용되었습니다! ${data.discountRate}% 할인`);
+      } else {
+        setDiscounRate(0);
+        setDiscountedPrice(totalPrice);
+        alert(data.message || '유효하지 않은 쿠폰입니다.');
+      }
+    } catch (error) {
+      console.error('쿠폰 적용 실패:', error);
+      alert('쿠폰 적용 중 오류가 발생했습니다.');
+    }
+  };
+
   return (
     <Container>
       <Row>

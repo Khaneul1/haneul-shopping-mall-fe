@@ -5,8 +5,9 @@ import { showToastMessage } from '../common/uiSlice';
 // 비동기 액션 생성
 export const getProductList = createAsyncThunk(
   'products/getProductList',
-  async (query, { rejectWithValue }) => {
+  async (query, { rejectWithValue }, params) => {
     try {
+      const query = new URLSearchParams(params).toString();
       const response = await api.get('/product', { params: { ...query } }); //받은 query 내용을 params에 넣어주겠다
       console.log('response 확인', response);
       // if (response.status !== 200) throw new Error(response.error);
@@ -14,6 +15,7 @@ export const getProductList = createAsyncThunk(
       //api 호출 : axios 라이브러리 통해 호출...
       //그래서 해당 라이브러리가 위의 코드를 넣어 주지 않더라도 자동으로 넣어 줌!!
       //그래서 전부 ~~ 정리해 줘도 됩니당
+
       return response.data;
     } catch (error) {
       rejectWithValue(error.error);
@@ -101,7 +103,6 @@ const productSlice = createSlice({
     error: '',
     totalPageNum: 1,
     success: false,
-    selectedCategory: '',
   },
   reducers: {
     setSelectedProduct: (state, action) => {
@@ -113,9 +114,6 @@ const productSlice = createSlice({
     clearError: (state) => {
       state.error = '';
       state.success = false;
-    },
-    setSelectedCategory: (state, action) => {
-      state.selectedCategory = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -194,10 +192,6 @@ const productSlice = createSlice({
   },
 });
 
-export const {
-  setSelectedProduct,
-  setFilteredList,
-  clearError,
-  setSelectedCategory,
-} = productSlice.actions;
+export const { setSelectedProduct, setFilteredList, clearError } =
+  productSlice.actions;
 export default productSlice.reducer;
